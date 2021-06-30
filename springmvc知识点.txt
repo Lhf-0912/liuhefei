@@ -1,0 +1,321 @@
+1.Spring MVC是一个基于Java的实现了MVC设计模式的请求驱动类型的轻量级Web框架，通过把Model，View，Controller分离，将web层进行职责解耦，把复杂的web应用分成逻辑清晰的几部分，简化开发，减少出错，方便组内开发人员之间的配合。
+
+2、springmvc流程
+
+
+（1）用户发送请求至前端控制器DispatcherServlet；
+（2） DispatcherServlet收到请求后，调用HandlerMapping处理器映射器，请求获取Handle；
+（3）处理器映射器根据请求url找到具体的处理器，生成处理器对象及处理器拦截器(如果有则生成)一并返回给DispatcherServlet；
+（4）DispatcherServlet 调用 HandlerAdapter处理器适配器；
+（5）HandlerAdapter 经过适配调用 具体处理器(Handler，也叫后端控制器)；
+（6）Handler执行完成返回ModelAndView；
+（7）HandlerAdapter将Handler执行结果ModelAndView返回给DispatcherServlet；
+（8）DispatcherServlet将ModelAndView传给ViewResolver视图解析器进行解析；
+（9）ViewResolver解析后返回具体View；
+（10）DispatcherServlet对View进行渲染视图（即将模型数据填充至视图中）
+（11）DispatcherServlet响应用户。
+
+3、springmvc的主要组件
+（1）前端控制器 DispatcherServlet（不需要程序员开发）
+
+​ 作用：接收请求，处理结果，相当于转发器，有了DispatcherServlet 就减少了其它组件之间的耦合度。
+
+(2) 处理器映射器 HandleMapping (不需要程序员开发)
+
+​ 作用：根据url找到 handler
+
+(3) 处理器适配器HandlerAdapter（适配器模式）
+
+​ 注意：在编写Handler的时候要按照HandlerAdapter要求的规则去编写，这样适配器HandlerAdapter才可以 正确的去执行Handler。
+
+(4) 处理器Handler（需要程序员开发）
+
+​ 作用：处理请求的具体过程。
+
+（5）视图解析器 ViewResolver（不需要程序员开发）
+
+​ 作用：进行视图的解析，根据视图逻辑名解析成真正的视图（view）
+
+（6）视图View（需要程序员开发jsp）
+
+​ View是一个接口， 它的实现类支持不同的视图类型（jsp，freemarker，pdf等等）
+
+4、springmvc的优点
+（1）可以支持各种视图技术,而不仅仅局限于JSP；
+
+（2）与Spring框架集成（如IoC容器、AOP等）；
+
+（3）清晰的角色分配：前端控制器(dispatcherServlet) , 请求到处理器映射（handlerMapping), 处理器适配器（HandlerAdapter), 视图解析器（ViewResolver）。
+
+（4）支持各种请求资源的映射策略。
+
+5、SpringMVC重定向和转发的
+（1）转发：在返回值前面加"forward:"，譬如"forward:user.do?name=method4"；
+
+（2）重定向：在返回值前面加"redirect:"，譬如"redirect:http://www.baidu.com。
+
+6、springMVC和struts2的区别
+（1）入口不同：springmvc的入口是一个servlet即前端控制器（DispatchServlet），而struts2入口是一个filter过虑器（StrutsPrepareAndExecuteFilter）。
+
+（2）开发对象不同：springmvc是基于方法开发(一个url对应一个方法)，请求参数传递到方法的形参，可以设计为单例或多例(建议单例)，struts2是基于类开发，传递参数是通过类的属性，只能设计为多例。
+
+（3）Struts采用值栈存储请求和响应的数据，通过OGNL存取数据，springmvc通过参数解析器是将request请求内容解析，并给方法形参赋值，将数据和视图封装成ModelAndView对象，最后又将ModelAndView中的模型数据通过reques域传输到页面。Jsp视图解析器默认使用jstl。
+
+7、springmvc常用注解
+[]: https://www.cnblogs.com/leskang/p/5445698.html#autoid-0-3-0 “参考地址”
+
+（1）Controller : 用于定义控制类
+
+（2）RequestMapping : 用来处理请求地址映射的注解，可以作用于类和方法上。
+
+​ 属性：
+
+​ value: 指定请求的实际地址，指定的地址可以是URI Template 模式
+
+​ method: 指定请求的method类型， GET、POST、PUT、DELETE等
+
+​ consumes： 指定处理请求的提交内容类型（Content-Type），例如application/json, text/html;
+
+​ produces: 指定返回的内容类型，仅当request请求头中的(Accept)类型中包含该指定类型才返回；
+
+​ params： 指定request中必须包含某些参数值是，才让该方法处理
+
+​ headers： 指定request中必须包含某些指定的header值，才能让该方法处理请求。
+
+（3）@ResponseBody : 该注解用于将Controller的方法返回的对象，通过适当的HttpMessageConverter转换为指定格式后，写入到Response对象的body数据区。使用时机：返回的数据不是html标签的页面，而是其他某 种格式的数据时（如json、xml等）使用；
+
+(4) @RequestParam : 用于在SpringMVC后台控制层获取参数，类似一种是 request.getParameter(“name”)，它有三个常用参数：defaultValue = “0”, required = false, value = “isApp”；defaultValue 表示设置默认值，required 铜过boolean设置是否是必须要传入的参数，value 值表示接受的传入的参数类型。
+
+(5) @PathVariable : 用于将请求URL中的模板变量映射到功能处理方法的参数上，即取出uri模板中的变量作为参数。
+
+(6) @ModelAttribute和 @SessionAttributes :代表的是：该Controller的所有方法在调用前，先执行此@ModelAttribute方法，可用于注解和方法参数中，可以把这个@ModelAttribute特性，应用在BaseController当中，所有的Controller继承BaseController，即可实现在调用Controller时，先执行@ModelAttribute方法。
+
+@SessionAttributes即将值放到session作用域中，写在class上面。
+
+8、springmvc异常处理
+（1）实现 HandlerExceptionResolver 接口，自定义自己的异常处理器
+
+@Component  
+public class MyException implements HandlerExceptionResolver{  
+
+    /**  
+     * TODO 简单描述该方法的实现功能（可选）.  
+     * @see org.springframework.web.servlet.HandlerExceptionResolver#resolveException(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, java.lang.Object, java.lang.Exception)  
+     */   
+    public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler,  
+            Exception ex) {  
+        System.out.println("This is exception handler method!");  
+        return null;  
+    }  
+}
+
+
+（2）使用@ExceptionHandler注解实现异常处理
+
+使用@ExceptionHandler注解作用在方法上面，参数是具体的异常类型。一旦系统抛出这种类型的异常时，会引导到该方法来处理。但是它的缺陷很明显，处理异常的方法和出错的方法(或者异常最终抛出来的地方)必须在同一个controller，不能全局控制。
+
+@RequestMapping(value = "/error111",method = RequestMethod.GET)
+    @ResponseBody
+    public ResultBean error111(){
+        service.test();
+      //  int i = 1/0;
+        return null;
+    }
+    
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseBody
+    public String error3(){
+        return "run time exception";
+    }
+    
+@org.springframework.stereotype.Service
+public class Service {
+    public void test(){
+        int i = 1/0;
+    }
+}  
+（3）@ControllerAdvice + @ExceptionHandler
+
+使用@ControllerAdvice 和@ExceptionHandler 可以全局控制异常，使业务逻辑和异常处理分隔开。
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(MyException.class)
+    @ResponseBody
+    public ResultBean handleMyException(MyException e){
+        System.out.println("handleMyException....");
+        return new ResultBean(e.getErrorEnum().getCode(),e.getErrorEnum().getMsg());
+    }
+
+
+}
+
+public class MyException extends RuntimeException {
+
+    private  ErrorEnum errorEnum;
+
+    public MyException(ErrorEnum errorEnum){
+        this.errorEnum  = errorEnum;
+    }
+
+
+
+    public ErrorEnum getErrorEnum() {
+        return errorEnum;
+    }
+}
+异常处理优先级：
+
+SpringMVC会如下处理：
+
+（1）SpringMVC会先从配置文件找异常解析器HandlerExceptionResolver
+
+（2）如果找到了异常异常解析器，那么接下来就会判断该异常解析器能否处理当前发生的异常
+
+（3）如果可以处理的话，那么就进行处理，然后给前台返回对应的异常视图
+
+（4）如果没有找到对应的异常解析器或者是找到的异常解析器不能处理当前的异常的时候，就看当前的Controller中有没有提供对应的异常处理器，如果提供了就由Controller自己进行处理并返回对应的视图
+
+（5）如果配置文件里面没有定义对应的异常解析器，而当前Controller中也没有定义的话，就看有没有全局ControllerAdvice提供的全局异常处理器，如果没有那么该异常就会被抛出来。
+
+9、springmvc拦截器的初步使用
+（1）定义一个类，继承HandlerInterceptor接口，并实现该接口的preHandle()、postHandle()、afterCompletion()三个方法
+
+public class LoginInterception implements HandlerInterceptor {
+
+    //处理器方法映射之前执行
+    //返回true，放行；false，不放行
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        System.out.println("处理器方法映射之前执行");
+        return true;
+    }
+    //处理器方法映射执行之后会自动调用
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        System.out.println("处理器方法映射执行之后会自动调用");
+    }
+    //所有请求完成之后调用
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        System.out.println("所有请求完成之后调用");
+    }
+
+（2）在springmvc的配置文件里面进行配置
+
+注意：在mvc:interceptors </mvc:interceptors> 里面直接配置bean则是拦截所有请求；在里面配置mvc:interceptor </mvc:interceptor>则可以通过配置 <mvc:mapping path="/intercep"/>拦截指定请求，或者配置<mvc:exclude-mapping path=""/>拦截除此之外的所有请求
+
+<mvc:interceptors>   
+        <!--自定义拦截器(拦截所有请求)-->
+        <bean class="fei.springmvc.interceptor.FristInterception"></bean>
+        <!--自定义拦截器(拦截指定请求)-->
+        <mvc:interceptor>
+            <mvc:mapping path="/intercep"/>
+            <bean class="fei.springmvc.interceptor.LoginInterception"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+10、json的使用
+通过Jackson框架就可以把Java里面的对象直接转化成Js可以识别的Json对象。具体步骤如下 ：
+
+（1）加入Jackson.jar
+
+（2）在配置文件中配置json的映射
+
+（3）在接受Ajax方法里面可以直接返回Object,List等,但方法前面要加上@ResponseBody注解。
+
+11、springmvc上传文件
+1、简介
+
+文件的上传与下载基本上是web项目中会用到的技术，在web学习中我们用到的是 Apache fileupload这个组件来实现上传，在springmvc中对它进行了封装，让我们使用起来比较方便，但是底层还是由Apache fileupload来实现的。springmvc中由MultipartFile接口来实现文件上传 。
+
+2、使用
+
+（1）导入jar包
+
+​ commons-fileupload
+
+​ commons-io
+
+​ commons-io可以不用自己导入，maven会自动导入对应版本的jar
+
+    <dependency>
+        <groupId>commons-fileupload</groupId>
+        <artifactId>commons-fileupload</artifactId>
+        <version>1.3.2</version>
+    </dependency>
+
+（2）前端jsp页面
+
+​ input的type设置为file
+
+​ form表单的method设为post,
+
+​ form表单的enctype设置为multipart/form-data，以二进制的形式传输数据。
+
+（3）使用MultipartFile对象作为参数，接收前端发送过来的文件，将文件写入本地文件中，就完成了上传操作
+
+@RequestMapping("/upload")
+public String upload(@RequestParam("file") MultipartFile file, HttpServletRequest req)
+        throws IllegalStateException, IOException {
+
+    // 判断文件是否为空，空则返回失败页面
+    if (file.isEmpty()) {
+        return "failed";
+    }
+    // 获取文件存储路径（绝对路径）
+    String path = req.getServletContext().getRealPath("/WEB-INF/file");
+    // 获取原文件名
+    String fileName = file.getOriginalFilename();
+    // 创建文件实例
+    File filePath = new File(path, fileName);
+    // 如果文件目录不存在，创建目录
+    if (!filePath.getParentFile().exists()) {
+        filePath.getParentFile().mkdirs();
+        System.out.println("创建目录" + filePath);
+    }
+    // 写入文件
+    file.transferTo(filePath);
+    return "success";
+} 
+（4）springmvc.xml配置CommonsMultipartResolver。
+
+<bean id="multipartResolver"
+    class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    <!--上传文件的最大大小，单位为字节 --> 
+    <property name="maxUploadSize" value="17367648787"></property>
+     
+    <!-- 上传文件的编码 -->
+    <property name="defaultEncoding" value="UTF-8"></property>
+</bean>
+
+12、springmvc乱码处理
+（1）解决post请求乱码问题：
+
+在web.xml中配置一个CharacterEncodingFilter过滤器，设置成utf-8；
+
+<filter>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+        <param-name>encoding</param-name>
+        <param-value>utf-8</param-value>
+    </init-param>
+</filter>
+
+<filter-mapping>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
+
+（2）get请求中文参数出现乱码解决方法有两个：
+
+①修改tomcat配置文件添加编码与工程编码一致，如下：
+
+<ConnectorURIEncoding="utf-8" connectionTimeout="20000" port="8080" protocol="HTTP/1.1" redirectPort="8443"/>
+1
+②另外一种方法对参数进行重新编码：
+
+String userName = new String(request.getParamter(“userName”).getBytes(“ISO8859-1”),“utf-8”)
+
+ISO8859-1是tomcat默认编码，需要将tomcat编码后的内容按utf-8编码。
